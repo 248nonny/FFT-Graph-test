@@ -1,0 +1,7 @@
+
+
+class FFTProcessor {
+public:
+    FFTProcessor();
+
+};
