@@ -98,7 +98,7 @@ static int audio_callback(
 }
 
 int create_pa_stream(
-                    FFTProcessor **fft_processor,
+                    FFTProcessor *fft_processor,
                     const int device_id,
                     const int channel_array_size
 ) {
