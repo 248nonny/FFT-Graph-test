@@ -64,7 +64,7 @@ static int audio_callback(
         void *userData
 ) {
 
-    DLOG(INFO) << "audio callback called.";
+    // DLOG(INFO) << "audio callback called.";
 
     double* in = (double*) input;
     (void)output;
@@ -73,43 +73,36 @@ static int audio_callback(
 
     std::vector<std::vector<double>> channel_data(data->channel_count);
 
-    DLOG(INFO) << "separating data into channels";
+    // DLOG(INFO) << "separating data into channels";
     for (int i = 0; i < data->channel_count; i++) {
         channel_data[i].resize(framesPerBuffer);
     }
 
     int channel_count = data->channel_count;
 
-    double channel_volume[2] = {0,0};
-
-    for (int channel = 0; channel < channel_count; channel++) {
-        for (int frame = 0; frame < framesPerBuffer; frame++) {
+    for (int frame = 0; frame < framesPerBuffer; frame++) {
+        for (int channel = 0; channel < channel_count; channel++) {
             channel_data[channel][frame] = in[frame * channel_count + channel];
+            printf("%lf  ", in[frame * channel_count + channel]);
         }
-        
-        channel_volume[channel] = channel_volume[channel] / framesPerBuffer;
-        DLOG(INFO) << "Channel: " << channel << " volume: " << in[channel];
     }
 
+    for (int i = 0; i < framesPerBuffer; i++) {
+        printf("%lf\n",in[i]);
+    }
 
-    DLOG(INFO) << "sending data to FFTProcessor.";
+    // DLOG(INFO) << "sending data to FFTCommander.";
 
     for (int i = 0; i < channel_count; i++) {
-        DLOG(INFO) << "sending channel " << i << ".";
-        // update to FFTProcessor.
-        // (*data).fft_commander[i]->receive_audio_data(channel_data[i]);
-
-        data->fft_processor[i]->test();
-        data->audio_buffer[i]->test();
-
-        DLOG(INFO) << "done.";
+        // DLOG(INFO) << "sending channel " << i << ".";
+        (*data).fft_processor[i]->test();
+        // DLOG(INFO) << "done.";
     }
 
-    DLOG(INFO) << "Audio Callback done running.";
+    // DLOG(INFO) << "Audio Callback done running.";
 
     return 0;
 }
-
 
 
 
