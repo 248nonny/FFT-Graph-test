@@ -1,4 +1,7 @@
 #include "audio.hpp"
+#include "src/audio/AudioBuffer.hpp"
+
+#include <math.h>
 #include <portaudio.h>
 
 
@@ -77,11 +80,17 @@ static int audio_callback(
 
     int channel_count = data->channel_count;
 
-    for (int frame = 0; frame < framesPerBuffer; frame++) {
-        for (int channel = 0; channel < channel_count; channel++) {
+    double channel_volume[2] = {0,0};
+
+    for (int channel = 0; channel < channel_count; channel++) {
+        for (int frame = 0; frame < framesPerBuffer; frame++) {
             channel_data[channel][frame] = in[frame * channel_count + channel];
         }
+        
+        channel_volume[channel] = channel_volume[channel] / framesPerBuffer;
+        DLOG(INFO) << "Channel: " << channel << " volume: " << in[channel];
     }
+
 
     DLOG(INFO) << "sending data to FFTProcessor.";
 
@@ -89,6 +98,10 @@ static int audio_callback(
         DLOG(INFO) << "sending channel " << i << ".";
         // update to FFTProcessor.
         // (*data).fft_commander[i]->receive_audio_data(channel_data[i]);
+
+        data->fft_processor[i]->test();
+        data->audio_buffer[i]->test();
+
         DLOG(INFO) << "done.";
     }
 
@@ -97,20 +110,29 @@ static int audio_callback(
     return 0;
 }
 
-int create_pa_stream(
-                    FFTProcessor *fft_processor,
-                    const int device_id,
-                    const int channel_array_size
-) {
+
+
+
+int AudioHandler::create_pa_stream() {
+
+    // create fft_processors and audio buffers:
+    fft_processor = new FFTProcessor*[channel_count];
+    audio_buffer = new AudioBuffer*[channel_count];
+    
+    for (int i = 0; i < channel_count; i++) {
+        fft_processor[i] = new FFTProcessor;
+        audio_buffer[i] = new AudioBuffer;
+    }
+
 
     PaError err;
-    PaStream *stream;
-    StreamData stream_data;
 
     int channel_count = Pa_GetDeviceInfo(device_id)->maxInputChannels;
 
     stream_data.fft_processor = fft_processor;
+    stream_data.audio_buffer = audio_buffer;
     stream_data.channel_count = channel_count;
+    stream_data.channel_array_size = channel_array_size;
 
     DLOG(INFO) << "Setting Audio Stream Parameters...";
 
@@ -120,6 +142,7 @@ int create_pa_stream(
     // we set the stream parameters.
     memset(&stream_output_parameters, 0, sizeof(stream_output_parameters));
     stream_output_parameters.channelCount = Pa_GetDeviceInfo(device_id)->maxOutputChannels;
+    // stream_output_parameters.channelCount = 0;
     stream_output_parameters.device = device_id;
     stream_output_parameters.hostApiSpecificStreamInfo = NULL;
     stream_output_parameters.sampleFormat = paFloat32;
@@ -155,6 +178,19 @@ int create_pa_stream(
 
     return (err >= 0);
 
+}
+
+int AudioHandler::close_stream() {
+    
+    PaError err;
+
+    err = Pa_CloseStream(stream);
+    checkErr(err);
+
+    return (err >= 0);
+}
+
+AudioHandler::AudioHandler() {
 }
 
 

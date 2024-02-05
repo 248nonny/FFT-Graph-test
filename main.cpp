@@ -16,11 +16,17 @@ int main (int argc, char *argv[]) {
     printf("%d\n",Audio::pa_init());
     Audio::get_pa_device_info();
 
-    FFTProcessor *fft_processor = new FFTProcessor;
+    Audio::AudioHandler audio_handler;
 
-    Audio::create_pa_stream(fft_processor, 5, 512);
+    audio_handler.set_device_id(5);
+    audio_handler.set_channel_count(2);
+    audio_handler.set_channel_array_size(512);
 
-    Pa_Sleep(1000 * 1000);
+    audio_handler.create_pa_stream();
+
+    Pa_Sleep(1000 * 4);
+
+    audio_handler.close_stream();
 
     return 0;
 }

@@ -25,7 +25,10 @@ link_directories(${GTKMM_LIBRARY_DIRS} ${FFTW3_LIBRARY_DIRS} ${GLOG_LIBRARY_DIRS
 
 file(GLOB_RECURSE SOURCES "./src/*.cpp" "./src/*/*.cpp")
 
-add_executable(${PROJECT_NAME} ${SOURCES} main.cpp)
+set(MAIN main.cpp)
+# set(MAIN "./test/audio-buffer-test.cpp") # Uncomment this and comment the above to test the audio buffer.
+
+add_executable(${PROJECT_NAME} ${SOURCES} ${MAIN})
 
 target_include_directories(${PROJECT_NAME} PRIVATE .)
 
