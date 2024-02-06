@@ -12,7 +12,7 @@ public:
 
     inline void write_value(float value) {
         data[index] = value;
-        printf("wrote %lf at index %d\n", data[index], index);
+        // printf("wrote %lf at index %d\n", data[index], index);
         advance_index();
     }
 
@@ -24,8 +24,13 @@ public:
 
         // set the ref_index to the current index if it is negative (default is -1, so if no parameter is given this is the output.)
         // (modulo buffer size so we don't go out of bounds.)
-        ref_index = (ref_index < 0) * index + (((ref_index > 0) * ref_index) % buffer_size);
 
+        // DLOG(INFO) << "buf_size: " << buffer_size;
+
+        // ref_index = (ref_index < 0) * index + (((ref_index >= 0) * ref_index) % buffer_size);
+        ref_index = (ref_index < 0) ? index : ref_index % buffer_size;
+
+        // DLOG(INFO) << "lakaka";
         // this operation ensures that if i is a large negative number, perhaps even greater than buffer_size,
         // then the index to get data from is still between 0 and buffer_size, and correctly follows the modulo index thingy.
         return data[((ref_index + i) % buffer_size + buffer_size) % buffer_size];
@@ -59,4 +64,5 @@ private:
 
     int sample_rate = 0; // in Hz
     double buffer_period = 0; // in seconds
+
 };

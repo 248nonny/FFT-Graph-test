@@ -41,14 +41,16 @@ public:
     int create_pa_stream(); // use device_id, channel_array_size, and fft_processor for this.
     int close_stream();
 
+
+    FFTProcessor **fft_processor;
+    AudioBuffer **audio_buffer;
+
 private:
 
     int device_id = 5;
     int channel_array_size = 512;
     int channel_count = 2;
 
-    FFTProcessor **fft_processor;
-    AudioBuffer **audio_buffer;
 
     StreamData stream_data;
     PaStream *stream;

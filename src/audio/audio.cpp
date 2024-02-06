@@ -71,24 +71,14 @@ static int audio_callback(
 
     StreamData *data = (StreamData*) userData;
 
-    std::vector<std::vector<double>> channel_data(data->channel_count);
-
-    // DLOG(INFO) << "separating data into channels";
-    for (int i = 0; i < data->channel_count; i++) {
-        channel_data[i].resize(framesPerBuffer);
-    }
-
     int channel_count = data->channel_count;
+
 
     for (int frame = 0; frame < framesPerBuffer; frame++) {
         for (int channel = 0; channel < channel_count; channel++) {
-            channel_data[channel][frame] = in[frame * channel_count + channel];
-            printf("%lf  ", in[frame * channel_count + channel]);
+            printf("%lf\n", in[frame * channel_count + channel]);
+            data->audio_buffer[channel]->write_value(in[frame * channel_count + channel]);
         }
-    }
-
-    for (int i = 0; i < framesPerBuffer; i++) {
-        printf("%lf\n",in[i]);
     }
 
     // DLOG(INFO) << "sending data to FFTCommander.";
@@ -126,6 +116,11 @@ int AudioHandler::create_pa_stream() {
     stream_data.audio_buffer = audio_buffer;
     stream_data.channel_count = channel_count;
     stream_data.channel_array_size = channel_array_size;
+
+    for (int i = 0; i < channel_count; i++) {
+        audio_buffer[i]->set_buffer_period(2);
+        audio_buffer[i]->set_sample_rate(Pa_GetDeviceInfo(device_id)->defaultSampleRate);
+    }
 
     DLOG(INFO) << "Setting Audio Stream Parameters...";
 

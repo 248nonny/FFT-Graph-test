@@ -1,7 +1,14 @@
 #include <glog/logging.h>
 #include <portaudio.h>
 
+#include "gtkmm/application.h"
 #include "src/audio/audio.hpp"
+#include "src/graph/Graph.hpp"
+
+
+#ifdef GTK_AUDIO_TEST
+    #include "src/gtk/MainWindow.hpp"
+#endif
 
 
 
@@ -24,7 +31,17 @@ int main (int argc, char *argv[]) {
 
     audio_handler.create_pa_stream();
 
-    Pa_Sleep(1000 * 4);
+    #ifdef GTK_AUDIO_TEST
+
+    auto app = Gtk::Application::create("org.gtkmm.example");
+
+
+
+    app->make_window_and_run<MainWindow>(argc, argv, 2, AxisType::LINEAR);
+
+    #else
+        Pa_Sleep(1000 * 1000);
+    #endif
 
     audio_handler.close_stream();
 
