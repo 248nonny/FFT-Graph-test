@@ -1,5 +1,5 @@
 #include <portaudio.h>
-#include "FFTProcessor.hpp"
+#include "src/fft/FFTProcessor.hpp"
 #include "src/audio/AudioBuffer.hpp"
 #include <glog/logging.h>
 

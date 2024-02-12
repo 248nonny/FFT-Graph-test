@@ -1,5 +1,6 @@
 
 
+#include "src/fft/FFTProcessor.hpp"
 #ifdef USE_GTK
 
 
@@ -15,9 +16,10 @@
 #include "sigc++/adaptors/bind.h"
 #include "src/audio/AudioBuffer.hpp"
 
-MainWindow::MainWindow(AudioBuffer **audio_buffer, int num_graphs, AxisType axis_type) :
+MainWindow::MainWindow(AudioBuffer **audio_buffer, FFTProcessor **fft_processor, int num_graphs, AxisType axis_type) :
     num_graphs(num_graphs),
-    audio_buffer(audio_buffer)
+    audio_buffer(audio_buffer),
+    fft_processor(fft_processor)
 {
 
 
@@ -32,7 +34,14 @@ MainWindow::MainWindow(AudioBuffer **audio_buffer, int num_graphs, AxisType axis
         graphs[i]->data.resize(1);
         graphs[i]->data[0].resize(graph_data_count);
 
-        graphs[i]->grid.ystart = -10;
+        graphs[i]->grid.x_type = axis_type;
+
+        // graphs[i]->grid.xstart = 0.001;
+        graphs[i]->grid.main_x_line_increment = 2000;
+        graphs[i]->grid.xstart = 3;
+        graphs[i]->grid.xstop = 22100;
+
+        graphs[i]->grid.ystart = -1;
         graphs[i]->grid.ystop = 10;
         graphs[i]->grid.main_y_line_increment = 1;
 
@@ -52,6 +61,8 @@ MainWindow::MainWindow(AudioBuffer **audio_buffer, int num_graphs, AxisType axis
     
     tasks_connection = conn;
 
+    DLOG(INFO) << "Finished initializing main window.";
+
 }
 
 bool MainWindow::tasks() {
@@ -68,8 +79,14 @@ bool MainWindow::update_graphs() {
         buf_index = audio_buffer[i]->get_current_index();
 
         for (int j = 0; j < graph_data_count; j++) {
-            graphs[i]->data[0][j][0] = (double)j / graph_data_count;
-            graphs[i]->data[0][j][1] = 10 * audio_buffer[i]->read_value(audio_resolution * (j - graph_data_count), buf_index);
+            // graphs[i]->data[0][j][0] = (double)j / graph_data_count;
+            // graphs[i]->data[0][j][1] = 10 * audio_buffer[i]->read_value(audio_resolution * (j - graph_data_count), buf_index);
+            // DLOG(INFO) << "ggasdasd";
+
+            graphs[i]->data[0][j][0] = (double)(j) * 44200 / fft_processor[i]->get_arr_size() + (j == 0) * graphs[i]->grid.xstart;
+            // graphs[i]->data[0][j][0] = 10;
+            // graphs[i]->data[0][0][0] = 0;
+            graphs[i]->data[0][j][1] = sqrt(sqrt(fft_processor[i]->out[j][0] * fft_processor[i]->out[j][0] + fft_processor[i]->out[j][1] * fft_processor[i]->out[j][1]));
         }
 
         graphs[i]->queue_draw();

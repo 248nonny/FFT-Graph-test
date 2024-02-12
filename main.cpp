@@ -37,7 +37,7 @@ int main (int argc, char *argv[]) {
 
 
 
-    app->make_window_and_run<MainWindow>(argc, argv,audio_handler.audio_buffer, 2, AxisType::LINEAR);
+    app->make_window_and_run<MainWindow>(argc, argv,audio_handler.audio_buffer, audio_handler.fft_processor, 2, AxisType::LOG);
 
     #else
         Pa_Sleep(1000 * 1000);
