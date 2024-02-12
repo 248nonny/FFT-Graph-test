@@ -13,15 +13,22 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
-add_compile_definitions(GTK_AUDIO_TEST)
 add_compile_definitions(GUI_SCALE=2)
 
+option(USE_GTK_GUI "enable this to enable compiling gtkmm related files; otherwise the gtkmm library will be excluded from compilation." OFF)
 
+set(USE_GTK_GUI ON)
 
-# add_definitions(-DNDEBUG) # if this line exists, DLOG calls from glog will not be compiled.
+if (USE_GTK_GUI)
+    add_compile_definitions(USE_GTK)
+    include_directories(${GTKMM_INCLUDE_DIRS} ${GLIBMM_INCLUDE_DIRS})
+    link_directories(${GTKMM_LIBRARY_DIRS})
+endif()
 
-include_directories(${GTKMM_INCLUDE_DIRS} ${GLIBMM_INCLUDE_DIRS} ${PORTAUDIO_INCLUDE_DIRS} ${FFTW3_INCLUDE_DIRS} ${GLOG_INCLUDE_DIRS})
-link_directories(${GTKMM_LIBRARY_DIRS} ${FFTW3_LIBRARY_DIRS} ${GLOG_LIBRARY_DIRS})
+add_definitions(-DNDEBUG) # if this line exists, DLOG calls from glog will not be compiled.
+
+include_directories(${PORTAUDIO_INCLUDE_DIRS} ${FFTW3_INCLUDE_DIRS} ${GLOG_INCLUDE_DIRS})
+link_directories(${FFTW3_LIBRARY_DIRS} ${GLOG_LIBRARY_DIRS})
 
 file(GLOB_RECURSE SOURCES "./src/*.cpp" "./src/*/*.cpp")
 

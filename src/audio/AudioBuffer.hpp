@@ -2,6 +2,8 @@
 
 #include <glog/logging.h>
 
+namespace Audio {
+
 class AudioBuffer {
 public:
     AudioBuffer();
@@ -17,7 +19,7 @@ public:
     }
 
     // 0 is oldest value, -1 is most recent value.
-    inline double read_value(int i, int ref_index = -1) {
+    inline float read_value(int i, int ref_index = -1) {
         // ref_index is the index to treat as 0; this exists just in case someone is writing data as we read (increasing the index),
         // which allows us to continue reading data in relation to the index we started with.
         // the index to feed into this can be obtained with the "get_current_index()" function.
@@ -36,7 +38,7 @@ public:
         return data[((ref_index + i) % buffer_size + buffer_size) % buffer_size];
     }
 
-    void pop_array(double *output, int array_size);
+    void pop_array(float *output, int array_size);
 
     void print_contents();
 
@@ -66,3 +68,5 @@ private:
     double buffer_period = 0; // in seconds
 
 };
+
+}

@@ -6,7 +6,7 @@
 #include "src/graph/Graph.hpp"
 
 
-#ifdef GTK_AUDIO_TEST
+#ifdef USE_GTK
     #include "src/gtk/MainWindow.hpp"
 #endif
 
@@ -31,13 +31,13 @@ int main (int argc, char *argv[]) {
 
     audio_handler.create_pa_stream();
 
-    #ifdef GTK_AUDIO_TEST
+    #ifdef USE_GTK
 
     auto app = Gtk::Application::create("org.gtkmm.example");
 
 
 
-    app->make_window_and_run<MainWindow>(argc, argv, 2, AxisType::LINEAR);
+    app->make_window_and_run<MainWindow>(argc, argv,audio_handler.audio_buffer, 2, AxisType::LINEAR);
 
     #else
         Pa_Sleep(1000 * 1000);

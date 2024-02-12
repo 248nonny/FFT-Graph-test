@@ -1,5 +1,7 @@
 #include "AudioBuffer.hpp"
 
+namespace Audio {
+
 AudioBuffer::AudioBuffer() {   
 }
 
@@ -20,7 +22,7 @@ void AudioBuffer::print_contents() {
     }
 }
 
-void AudioBuffer::pop_array(double *output, int array_size) {
+void AudioBuffer::pop_array(float *output, int array_size) {
     int ref_index = index;
 
     for (int i = 0; i < array_size; i++) {
@@ -34,4 +36,6 @@ void AudioBuffer::resize_buffer(int size) {
     
     delete data;
     data = new float[buffer_size];
+}
+
 }

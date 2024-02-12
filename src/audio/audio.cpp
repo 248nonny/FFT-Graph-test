@@ -55,6 +55,10 @@ void get_pa_device_info() {
     }
 }
 
+double max(double a, double b) {
+    return a > b ? a : b;
+}
+
 static int audio_callback(
         const void *input,
         void *output,
@@ -66,7 +70,7 @@ static int audio_callback(
 
     // DLOG(INFO) << "audio callback called.";
 
-    double* in = (double*) input;
+    float* in = (float*) input;
     (void)output;
 
     StreamData *data = (StreamData*) userData;
@@ -76,16 +80,48 @@ static int audio_callback(
 
     for (int frame = 0; frame < framesPerBuffer; frame++) {
         for (int channel = 0; channel < channel_count; channel++) {
-            printf("%lf\n", in[frame * channel_count + channel]);
+            // printf("i: %d: %lf\n", frame * channel_count + channel, in[frame * channel_count + channel]);
             data->audio_buffer[channel]->write_value(in[frame * channel_count + channel]);
         }
     }
+
+
+
+
+    // // for visually testing l/r channels on the laptop
+    // // source for this code, and much of the port audio code is https://www.youtube.com/watch?v=jpsJCji71Ec
+    // // Although much of this was (I believe) copied from the portaudio examples in the docs.
+    // printf("\r");
+
+    // float vol_r = 0;
+    // float vol_l = 0;
+
+    // for (int i = 0; i < framesPerBuffer * 2; i += 2) {
+    //     vol_r = max(vol_r, abs(in[i]));
+    //     vol_l = max(vol_l, abs(in[i + 1]));
+    // }
+
+    // int disp_size = 100;
+    // for (int i = 0; i < disp_size; i++) {
+    //     float bar_proportion = i / (float)disp_size;
+    //     if (bar_proportion <= vol_l && bar_proportion <= vol_r) {
+    //         printf("█");
+    //     } else if (bar_proportion <= vol_l) {
+    //         printf("▀");
+    //     } else if (bar_proportion <= vol_r) {
+    //         printf("▄");
+    //     } else {
+    //         printf(" ");
+    //     }
+    // }
+
+
 
     // DLOG(INFO) << "sending data to FFTCommander.";
 
     for (int i = 0; i < channel_count; i++) {
         // DLOG(INFO) << "sending channel " << i << ".";
-        (*data).fft_processor[i]->test();
+        // (*data).fft_processor[i]->test();
         // DLOG(INFO) << "done.";
     }
 
