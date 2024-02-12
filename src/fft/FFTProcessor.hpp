@@ -4,13 +4,14 @@
 #include <fftw3.h>
 
 
+namespace FFT {
 
-class FFTProcessor {
+class Processor {
 public:
     // max period is measured in data points; true max period will be the closest (just under) power of two.
     // frame size is the number of new elements that there are every time the ffts are executed;
     // this should be the same as framerPerBuffer for the corresponding audio stream.
-    FFTProcessor();
+    Processor();
 
     void new_data();
 
@@ -29,3 +30,5 @@ private:
     double *in;
     double *freqs;
 };
+
+}

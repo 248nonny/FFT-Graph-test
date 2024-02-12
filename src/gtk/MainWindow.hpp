@@ -15,11 +15,11 @@ class MainWindow : public Gtk::Window
 {
 public:
     // **audio_buffer contains pointers that we'll read data from.
-    MainWindow(AudioBuffer **audio_buffer, FFTProcessor **fft_processor, int num_graphs = 2, AxisType axis_type = AxisType::LINEAR);
+    MainWindow(AudioBuffer **audio_buffer, FFT::Processor **fft_processor, int num_graphs = 2, AxisType axis_type = AxisType::LINEAR);
 
     Graph **graphs;
     AudioBuffer **audio_buffer;
-    FFTProcessor **fft_processor;
+    FFT::Processor **fft_processor;
 
     Gtk::Grid main_grid;
 

@@ -3,6 +3,7 @@
 
 #include "gtkmm/application.h"
 #include "src/audio/audio.hpp"
+#include "src/audio/AudioHandler.hpp"
 #include "src/graph/Graph.hpp"
 
 
@@ -23,7 +24,7 @@ int main (int argc, char *argv[]) {
     printf("%d\n",Audio::pa_init());
     Audio::get_pa_device_info();
 
-    Audio::AudioHandler audio_handler;
+    Audio::Handler audio_handler;
 
     audio_handler.set_device_id(5);
     audio_handler.set_channel_count(2);

@@ -16,7 +16,7 @@
 #include "sigc++/adaptors/bind.h"
 #include "src/audio/AudioBuffer.hpp"
 
-MainWindow::MainWindow(AudioBuffer **audio_buffer, FFTProcessor **fft_processor, int num_graphs, AxisType axis_type) :
+MainWindow::MainWindow(AudioBuffer **audio_buffer, FFT::Processor **fft_processor, int num_graphs, AxisType axis_type) :
     num_graphs(num_graphs),
     audio_buffer(audio_buffer),
     fft_processor(fft_processor)
