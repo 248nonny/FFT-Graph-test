@@ -88,8 +88,7 @@ int Handler::create_pa_stream() {
 
     // we set the stream parameters.
     memset(&stream_output_parameters, 0, sizeof(stream_output_parameters));
-    stream_output_parameters.channelCount = Pa_GetDeviceInfo(device_id)->maxOutputChannels;
-    // stream_output_parameters.channelCount = 0;
+    stream_output_parameters.channelCount = 1;
     stream_output_parameters.device = device_id;
     stream_output_parameters.hostApiSpecificStreamInfo = NULL;
     stream_output_parameters.sampleFormat = paFloat32;

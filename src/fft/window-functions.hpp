@@ -7,7 +7,7 @@
 #pragma region
 
 
-namespace FFTWindow {
+namespace FFT {
 
     enum class WindowType {
         HANN,
@@ -16,18 +16,19 @@ namespace FFTWindow {
         BLACKMAN,
         BLACKMAN_HARRIS,
         BARTLETT,
-        WELCH
+        WELCH,
+        NONE
     };
 
-    const short window_count = 7;
+    const short window_count = 8;
 
     extern const char* names[window_count];
 
-    void make_window_array(FFTWindow::WindowType window_type, double * array, int array_size);
+    void make_window_array(FFT::WindowType window_type, double * array, int array_size);
 }
 
 
-inline int e2i (FFTWindow::WindowType window_type) {
+inline int e2i (FFT::WindowType window_type) {
     return static_cast<int>(window_type);
 }
 
