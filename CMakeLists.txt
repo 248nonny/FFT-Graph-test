@@ -35,6 +35,7 @@ file(GLOB_RECURSE SOURCES "./src/*.cpp" "./src/*/*.cpp")
 
 set(MAIN main.cpp)
 # set(MAIN "./test/audio-buffer-test.cpp") # Uncomment this and comment the above to test the audio buffer.
+# set(MAIN "./test/compass-test.cpp") # Uncomment this and comment the above to test the audio compass.
 
 add_executable(${PROJECT_NAME} ${SOURCES} ${MAIN})
 

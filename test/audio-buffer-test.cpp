@@ -12,7 +12,7 @@ int main(int argc, char *argv[]) {
     gflags::ParseCommandLineFlags(&argc,&argv,true);
     fLB::FLAGS_logtostderr = 1;
 
-    AudioBuffer buffer;
+    Audio::AudioBuffer buffer;
 
     buffer.set_buffer_period(2);
     buffer.set_sample_rate(300);
@@ -23,7 +23,7 @@ int main(int argc, char *argv[]) {
         buffer.write_value(i);
     }
 
-    double output[500];
+    float output[500];
 
     buffer.pop_array(output, 500);
 
