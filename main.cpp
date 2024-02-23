@@ -5,6 +5,7 @@
 
 
 #include "gtkmm/application.h"
+#include "src/WaveTracer.hpp"
 #include "src/audio/audio.hpp"
 #include "src/audio/AudioHandler.hpp"
 #include "src/graph/Graph.hpp"\
@@ -54,13 +55,16 @@ int main (int argc, char *argv[]) {
 
     audio_handler.create_pa_stream();
 
+    WaveTracer *wave_tracer = new WaveTracer;
+
+    wave_tracer->set_fft_processors(audio_handler.fft_processor);
+
     #ifdef USE_GTK
 
     auto app = Gtk::Application::create("org.gtkmm.example");
 
 
-
-    app->make_window_and_run<MainWindow>(argc, argv,audio_handler.audio_buffer, audio_handler.fft_processor, 1, AxisType::LOG);
+    app->make_window_and_run<MainWindow>(0, argv, audio_handler.audio_buffer, audio_handler.fft_processor, wave_tracer, 3, AxisType::LOG);
 
     #else
         Pa_Sleep(1000 * 1000);

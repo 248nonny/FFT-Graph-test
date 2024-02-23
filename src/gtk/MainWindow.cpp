@@ -1,6 +1,11 @@
 
 
+#include "glibmm/ustring.h"
+#include "gtkmm/enums.h"
+#include "src/WaveTracer.hpp"
 #include "src/fft/FFTProcessor.hpp"
+#include <cstring>
+#include <functional>
 #ifdef USE_GTK
 
 
@@ -16,17 +21,23 @@
 #include "sigc++/adaptors/bind.h"
 #include "src/audio/AudioBuffer.hpp"
 
-MainWindow::MainWindow(AudioBuffer **audio_buffer, FFT::Processor **fft_processor, int num_graphs, AxisType axis_type) :
+MainWindow::MainWindow(AudioBuffer **audio_buffer, FFT::Processor **fft_processor,WaveTracer *wave_tracer, int num_graphs, AxisType axis_type) :
     num_graphs(num_graphs),
     audio_buffer(audio_buffer),
-    fft_processor(fft_processor)
+    fft_processor(fft_processor),
+    submit_settings_button("Submit Settings"),
+    left_box(Gtk::Orientation::VERTICAL),
+    graph_box(Gtk::Orientation::VERTICAL),
+    wave_tracer(wave_tracer)
 {
-
+    DLOG(INFO) << "initializing main window...";
 
     // setup graph widgets:
     set_child(main_grid);
 
     graphs = new Graph*[num_graphs];
+
+    compass.allocate_data(100);
 
     for (int i = 0; i < num_graphs; i++) {
         DLOG(INFO) << "i: " << i;
@@ -50,9 +61,24 @@ MainWindow::MainWindow(AudioBuffer **audio_buffer, FFT::Processor **fft_processo
         }
 
         DLOG(INFO) << "Wrote data";
-        main_grid.attach(*graphs[i], 0, i);
+        graph_box.append(*graphs[i]);
         graphs[i]->set_size_request(400 * GUI_SCALE, 100 * GUI_SCALE);
     }
+
+    submit_settings_button.signal_clicked().connect(sigc::mem_fun(*this, &MainWindow::on_button_submit_settings));
+
+    main_grid.attach(left_box, 0, 0);
+    main_grid.attach(graph_box, 1, 0);
+
+    left_box.set_hexpand(true);
+    graph_box.set_hexpand(false);
+    graph_box.set_size_request(800,-1);
+    left_box.append(compass);
+    settings_entry.set_max_length(100);
+    // settings_entry.set_expand(true);
+    left_box.append(settings_entry);
+    left_box.append(submit_settings_button);
+    submit_settings_button.set_size_request(-1,50);
 
     // create and connect timer to update_graphs() function.
     sigc::slot<bool()> m_slot = sigc::bind(sigc::mem_fun(*this, &MainWindow::tasks));
@@ -66,7 +92,12 @@ MainWindow::MainWindow(AudioBuffer **audio_buffer, FFT::Processor **fft_processo
 }
 
 bool MainWindow::tasks() {
-    return update_graphs();;
+
+    wave_tracer->process_data();
+
+    update_compass();
+
+    return update_graphs();
 }
 
 bool MainWindow::update_graphs() {
@@ -95,6 +126,51 @@ bool MainWindow::update_graphs() {
     return true;
 }
 
+void MainWindow::update_compass() {
+
+    std::function<double(double)> fn;
+    double data_arg;
+    double data_mag;
+
+    double interval = 2 * M_PI / compass.get_data_size();
+
+
+    for (int i = 0; i < wave_tracer->data_size; i++) {
+        data_arg = wave_tracer->data[i][0];
+        data_mag = wave_tracer->data[i][1];
+
+        for (int j = 0; j < compass.get_data_size(); j++) {
+            // compass.data[i] = 0;
+            if (data_arg < j * interval) {
+                compass.data[j] = data_mag * 100;
+                if (data_mag > 0.3)
+                    printf("i: %4d, j: %4d, arg: %9.5lf, real arg: %9.5lf mag: %9.5lf\n", i, j, data_arg, j * interval, data_mag);
+                break;
+            }
+        }
+    }
+
+    // calculate and feed mic volumes.
+    double volume[3] = {0,0,0};
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 1000; j++) {
+            volume[i] += audio_buffer[wave_tracer->mic_order[i] - 1]->read_value(j-1000);
+        }
+        compass.mic_volumes[i] = volume[i] / 1000;
+    }
+
+    compass.queue_draw();
+}
+
+void MainWindow::on_button_submit_settings() {
+    Glib::ustring settings = settings_entry.get_text();
+
+    if (settings.length() == 3) {
+        microphone_order[0] = settings[0] <= 3 ? settings[0] - 48 : microphone_order[0];
+        microphone_order[0] = settings[0] <= 3 ? settings[1] - 48 : microphone_order[1];
+        microphone_order[0] = settings[0] <= 3 ? settings[2] - 48 : microphone_order[2];
+    }
+}
 
 
 #endif

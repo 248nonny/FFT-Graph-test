@@ -25,8 +25,8 @@ if (USE_GTK_GUI)
     link_directories(${GTKMM_LIBRARY_DIRS})
 endif()
 
-# add_definitions(-DNDEBUG) # if this line exists, DLOG calls from glog will not be compiled.
-set(CMAKE_BUILD_TYPE Debug)
+add_definitions(-DNDEBUG) # if this line exists, DLOG calls from glog will not be compiled.
+# set(CMAKE_BUILD_TYPE Debug)
 
 include_directories(${PORTAUDIO_INCLUDE_DIRS} ${FFTW3_INCLUDE_DIRS} ${GLOG_INCLUDE_DIRS})
 link_directories(${FFTW3_LIBRARY_DIRS} ${GLOG_LIBRARY_DIRS})

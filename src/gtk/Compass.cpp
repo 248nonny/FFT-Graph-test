@@ -100,7 +100,6 @@ void Compass::draw_arc(const Cairo::RefPtr<Cairo::Context>& cr, double xc, doubl
 void Compass::draw_data(const Cairo::RefPtr<Cairo::Context>& cr) {
     cr->set_line_width(scale/3);
     for (int i = 0; i < data_size; i++) {
-        data[i] = sin(2 * M_PI * 3 * i/data_size);
         draw_sector(cr, 0, 0, outer_compass_radius, inner_compass_radius, i * 2 * M_PI / data_size, (i+1) * 2 * M_PI / data_size);
         // cr->set_source_rgb(3.0 * i / data_size, -3.0 * i / data_size + 2, 3.0 * i / data_size - 2);
         cr->set_source_rgba(data_rgb[0], data_rgb[1], data_rgb[2], data[i]);

@@ -11,6 +11,9 @@ public:
     double *data = nullptr; // values should range from 0 to 1.
 
     void allocate_data(int data_size);
+    double get_data_size() {
+        return this->data_size;
+    }
 
     double mic_volumes[3] = {0.4, 0.8, 0.3}; // should also range from 0 to 1.
 
