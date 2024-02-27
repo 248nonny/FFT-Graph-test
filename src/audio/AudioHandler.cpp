@@ -1,5 +1,10 @@
 #include "AudioHandler.hpp"
 
+
+// Note that the structures of the audio_callback() and create_pa_stream()
+// functions were mostly copied from the port audio website as well as the
+// YouTube tutorial: https://www.youtube.com/watch?v=jpsJCji71Ec
+
 namespace Audio {
 
 

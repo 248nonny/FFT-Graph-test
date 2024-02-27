@@ -4,9 +4,18 @@
 #include <math.h>
 #include <portaudio.h>
 
+// Note: Much of this code was copied from the YouTube tutorial
+// https://www.youtube.com/watch?v=jpsJCji71Ec
+
+// Code for the tutorial is found at:
+// https://github.com/chrisrouck/tutorial-cpp-audio-capture/releases/tag/v1.0.0
+
 
 namespace Audio {
 
+// a function that prints port audio error text if fed an error code.
+// does nothing if error code is "paNoError."
+// partially copied from PortAudio examples.
 static void checkErr(PaError err) {
     if (err != paNoError) {
         printf("PortAudio Error: %s\n", Pa_GetErrorText(err));
@@ -14,12 +23,23 @@ static void checkErr(PaError err) {
     }
 }
 
+// A function that initializes the PortAudio library.
 int pa_init() {
     PaError err;
     err = Pa_Initialize();
     checkErr(err);
     return (err >= 0);
 }
+
+// a function to terminate PortAudio.
+int pa_term() {
+    PaError err;
+    err = Pa_Terminate();
+    checkErr(err);
+    return err >= 0;
+}
+
+// A function to get information from available devices and print the info for the user.
 
 void get_pa_device_info() {
     DLOG(INFO) << "getting PA device info.";

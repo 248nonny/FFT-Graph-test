@@ -134,17 +134,22 @@ void MainWindow::update_compass() {
 
     double interval = 2 * M_PI / compass.get_data_size();
 
+    // clear data
+    for (int j = 0; j < compass.get_data_size(); j++) {
+        compass.data[j] = 0;
+    }
 
     for (int i = 0; i < wave_tracer->data_size; i++) {
-        data_arg = wave_tracer->data[i][0];
-        data_mag = wave_tracer->data[i][1];
+        // data_arg = wave_tracer->data[i][0];
+        // data_mag = wave_tracer->data[i][1];
+        wave_tracer->get_avg_data(i, &data_arg, &data_mag);
 
         for (int j = 0; j < compass.get_data_size(); j++) {
             // compass.data[i] = 0;
-            if (data_arg < j * interval) {
-                compass.data[j] = data_mag * 100;
-                if (data_mag > 0.3)
-                    printf("i: %4d, j: %4d, arg: %9.5lf, real arg: %9.5lf mag: %9.5lf\n", i, j, data_arg, j * interval, data_mag);
+            if (data_arg <= j * interval && data_arg >= 0.001) {
+                compass.data[j] += pow(data_mag * .05,3);
+                // if (data_mag > 0.3)
+                //     printf("i: %4d, j: %4d, arg: %9.5lf, real arg: %9.5lf mag: %9.5lf\n", i, j, data_arg, j * interval, data_mag);
                 break;
             }
         }
@@ -166,9 +171,13 @@ void MainWindow::on_button_submit_settings() {
     Glib::ustring settings = settings_entry.get_text();
 
     if (settings.length() == 3) {
-        microphone_order[0] = settings[0] <= 3 ? settings[0] - 48 : microphone_order[0];
-        microphone_order[0] = settings[0] <= 3 ? settings[1] - 48 : microphone_order[1];
-        microphone_order[0] = settings[0] <= 3 ? settings[2] - 48 : microphone_order[2];
+        microphone_order[0] = settings[0] <= 3 + 48 ? settings[0] - 48 : microphone_order[0];
+        microphone_order[1] = settings[1] <= 3 + 48 ? settings[1] - 48 : microphone_order[1];
+        microphone_order[2] = settings[2] <= 3 + 48 ? settings[2] - 48 : microphone_order[2];
+        wave_tracer->mic_order[0] = microphone_order[0];
+        wave_tracer->mic_order[1] = microphone_order[1];
+        wave_tracer->mic_order[2] = microphone_order[2];
+        printf("%d, %d, %d\n", wave_tracer->mic_order[0],wave_tracer->mic_order[1],wave_tracer->mic_order[2]);
     }
 }
 

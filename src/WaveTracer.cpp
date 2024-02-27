@@ -12,20 +12,58 @@ WaveTracer::WaveTracer() {
     set_data_size(8192);
 }
 
+inline double arg(double x, double y) {
+    double out = atan(y / x);
 
+    // expand arctan to the interval [-π/2, 3π/2].
+    out = (sgn(x) >= 0) ? out : out + M_PI;
+
+    // restrict out to interval [0, 2π].
+    // out = (out > 0) ? out : out + 2 * M_PI;
+    return (out > 0) ? out : out + 2 * M_PI;
+}
+
+inline double mag(double x, double y) {
+    return sqrt(pow(x,2) + pow(y,2));
+}
 
 void WaveTracer::set_fft_processors(FFT::Processor **fft_processor) {
     this->fft_processor = fft_processor;
 }
 
 void WaveTracer::set_data_size(int data_size) {
+
+    printf("asdasdasd\n");
+    if (data != nullptr) {
+        for (int i = 0; i < histogram_size; i++) {
+            if (data[i] != nullptr) {
+                for (int j = 0; j < this->data_size; j++) {
+                    if (data[i][j] != nullptr)
+                        delete data[i][j];
+                }
+            }
+
+            delete data[i];
+        }
+    }
+
+    delete data;
+
+    printf("1123412fdmnfsd\n");
+
     this->data_size = data_size;
 
-    data = new double*[data_size];
+    data = new double**[histogram_size];
 
-    for (int i = 0; i < data_size; i++) {
-        data[i] = new double[2];
+    for (int i = 0; i < histogram_size; i ++) {
+
+        data[i] = new double*[data_size];
+
+        for (int j = 0; j < data_size; j++) {
+            data[i][j] = new double[2];
+        }
     }
+
 }
 
 void WaveTracer::process_data() {
@@ -33,8 +71,8 @@ void WaveTracer::process_data() {
     double x;
     double y;
 
-    double arg;
-    double mag;
+    double data_arg;
+    double data_mag;
 
     double m[3];  // magnitudes of frequencies will be stored here for mics 1 thru 3.
 
@@ -56,30 +94,40 @@ void WaveTracer::process_data() {
         y = m[0] - m[1] * sin(M_PI_2 / 3.0) - m[2] * sin(M_PI_2 / 3.0);
 
 
-        mag = sqrt(pow(x,2) + pow(y,2));
+        data_mag = mag(x,y);
 
-        // if (mag > 0.001 && mag < 30) {
+        if (data_mag > 0.001 && data_mag < 30) {
 
-            arg = atan(y / x);
+            data_arg = arg(x,y);
 
-            // expand arctan to the interval [-π/2, 3π/2].
-            arg = (sgn(x) >= 0) ? arg : arg + M_PI;
+        } else {
+            data_arg = 0;
+        }
 
-            // restrict arg to interval [0, 2π].
-            arg = (arg > 0) ? arg : arg + 2 * M_PI;
-
-            // if (mag > 10)
-            // printf("arg: %9.5lf, mag: %9.5lf\n", arg, mag);
-
-        // } else {
-        //     arg = 0;
-        // }
-        // store data.
-        data[i][0] = arg;
-        data[i][1] = mag;
+        write_data(data_arg, data_mag, i);
 
         // printf("data: %9.5lf, mag: %9.5lf\n", data[i][1], mag);
 
     }
 }
 
+void WaveTracer::write_data(double arg, double mag, int f) {
+    data[index][f][0] = arg;
+    data[index][f][1] = mag;
+
+    index = (index + 1) % histogram_size;
+}
+
+void WaveTracer::get_avg_data(int f, double *arg_out, double *mag_out) {
+
+    double x = 0;
+    double y = 0;
+
+    for (int i = 0; i < histogram_size; i++) {
+        x += data[i][f][1] * cos(data[i][f][0]) * (((histogram_size - index + i) % histogram_size) * 2.0 / histogram_size);
+        y += data[i][f][1] * sin(data[i][f][0]) * (((histogram_size - index + i) % histogram_size) * 2.0 / histogram_size);
+    }
+
+    *arg_out = arg(x, y);
+    *mag_out = *arg_out == 0 ? 0 : mag(x, y);
+}

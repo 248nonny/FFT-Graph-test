@@ -1,10 +1,16 @@
 cmake_minimum_required(VERSION 3.26.1)
 
-project(FFT_graph_test)
+project(WaveTrace)
+
+set(USE_GTK_GUI ON)
 
 find_package(PkgConfig REQUIRED)
-pkg_check_modules(GTKMM gtkmm-4.0)
-pkg_check_modules(GLIBMM glibmm-2.68)
+
+if (USE_GTK_GUI)
+    pkg_check_modules(GTKMM gtkmm-4.0)
+    pkg_check_modules(GLIBMM glibmm-2.68)
+endif()
+
 pkg_check_modules(PORTAUDIO portaudiocpp)
 pkg_check_modules(FFTW3 fftw3)
 pkg_check_modules(GLOG libglog)
@@ -17,7 +23,6 @@ add_compile_definitions(GUI_SCALE=2)
 
 option(USE_GTK_GUI "enable this to enable compiling gtkmm related files; otherwise the gtkmm library will be excluded from compilation." OFF)
 
-set(USE_GTK_GUI ON)
 
 if (USE_GTK_GUI)
     add_compile_definitions(USE_GTK)
