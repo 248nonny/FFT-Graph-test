@@ -12,6 +12,7 @@ public:
         DLOG(INFO) << "AudioBuffer test.";
     }
 
+    // fairly simple function that writes a value and advances to the next index.
     inline void write_value(float value) {
         data[index] = value;
         // printf("wrote %lf at index %d\n", data[index], index);
@@ -37,9 +38,11 @@ public:
 
     void print_contents();
 
-    void set_sample_rate(int rate);
+    void set_sample_rate(int rate);         // set the sample rate of the incoming data.
     void set_buffer_period(double seconds); // set the length of time worth of data to store in the buffer.
 
+
+    // inline getter functions.
     int get_sample_rate() {return sample_rate;}
     int get_buffer_period() {return buffer_period;}
 
@@ -55,7 +58,7 @@ private:
     void resize_buffer(int size = -1);
 
     inline void advance_index() {
-        // we must advance the index by 1, but in modulo "buffer_size."
+        // advance the index by 1, modulo "buffer_size."
         index = (index + 1) % buffer_size;
     }
 

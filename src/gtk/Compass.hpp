@@ -1,9 +1,9 @@
 #pragma once
 
-
 #include "gtkmm/drawingarea.h"
 
-
+// This class is a custom Gtk widget based on the DrawingArea, which serves the purpose of
+// visualizing the directional audio data that the WaveTrace POC spits out.
 class Compass : public Gtk::DrawingArea {
 public:
     Compass();
@@ -11,6 +11,7 @@ public:
     double *data = nullptr; // values should range from 0 to 1.
 
     void allocate_data(int data_size);
+
     double get_data_size() {
         return this->data_size;
     }
@@ -36,9 +37,13 @@ private:
     std::function<double(double)> trnfrm[2];
 
     void draw_data(const Cairo::RefPtr<Cairo::Context>& cr);
+
+    // custom drawing functions to draw relevant shapes more easily
     void draw_sector(const Cairo::RefPtr<Cairo::Context>& cr, double xc, double yc, double r1, double r2, double a1, double a2);
     void draw_arc(const Cairo::RefPtr<Cairo::Context>& cr, double xc, double yc, double r, double a1, double a2);
 
+    // function that calculates a transformation from an arbitrary x,y coordinate system to literal pixels;
+    // useful for easy scaling.
     void get_trnfrm();
 
 };

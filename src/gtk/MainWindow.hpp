@@ -1,6 +1,6 @@
 #pragma once
 #include "src/WaveTracer.hpp"
-#ifdef USE_GTK // only compile if this is defined in CMakeLists.txt.
+#ifdef USE_GTK // only compile if this macro is defined in CMakeLists.txt.
 
 #include <gtkmm.h>
 #include <vector>
@@ -13,12 +13,15 @@
 
 using Audio::AudioBuffer;
 
+// this is the window object that Gtk displays for the POC.
+
 class MainWindow : public Gtk::Window
 {
 public:
     // **audio_buffer contains pointers that we'll read data from.
     MainWindow(AudioBuffer **audio_buffer, FFT::Processor **fft_processor, WaveTracer *wave_tracer, int num_graphs = 2, AxisType axis_type = AxisType::LINEAR);
 
+    // pointers to objects we will interact with.
     Graph **graphs;
     AudioBuffer **audio_buffer;
     FFT::Processor **fft_processor;
@@ -27,6 +30,7 @@ public:
     Gtk::Grid main_grid;
 
     int get_num_graphs() {return num_graphs; }
+
 private:
 
 

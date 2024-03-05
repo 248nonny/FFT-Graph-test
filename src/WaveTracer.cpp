@@ -12,6 +12,7 @@ WaveTracer::WaveTracer() {
     set_data_size(8192);
 }
 
+// a function to find the argument of a vector given its components
 inline double arg(double x, double y) {
     double out = atan(y / x);
 
@@ -23,6 +24,7 @@ inline double arg(double x, double y) {
     return (out > 0) ? out : out + 2 * M_PI;
 }
 
+// a function to find the magnitude of a vector given its components.
 inline double mag(double x, double y) {
     return sqrt(pow(x,2) + pow(y,2));
 }
@@ -33,7 +35,6 @@ void WaveTracer::set_fft_processors(FFT::Processor **fft_processor) {
 
 void WaveTracer::set_data_size(int data_size) {
 
-    printf("asdasdasd\n");
     if (data != nullptr) {
         for (int i = 0; i < histogram_size; i++) {
             if (data[i] != nullptr) {
@@ -49,7 +50,6 @@ void WaveTracer::set_data_size(int data_size) {
 
     delete data;
 
-    printf("1123412fdmnfsd\n");
 
     this->data_size = data_size;
 
@@ -76,20 +76,26 @@ void WaveTracer::process_data() {
 
     double m[3];  // magnitudes of frequencies will be stored here for mics 1 thru 3.
 
-    for (int i = 0; i < data_size - 7000; i++) {
+    for (int i = 0; i < data_size - 4000; i++) {
+
+        // ignore the last 4000 data points, since the high frequencies are full of noise and propagate
+        // more uniformly and through more things, making their direction estimate more error prone.
+
         // we assume mic 1 points forwards, and mic 2 and 3 are located counterclockwise at 120 degree intervals.
         // we add the fft data from each microphone as vectors pointing in the direction of each microphone,
         // and then express the vectors in polar form and save them in the data array:
 
         for (int j = 0; j < 3; j++) {
-            // printf("j: %d\n", j);
+            // m[j] = mag(fft_processor[mic_order[j] - 1]->out[i][0], fft_processor[mic_order[j] - 1]->out[i][1])
             m[j] = sqrt(pow(fft_processor[mic_order[j] - 1]->out[i][0],2) + pow(fft_processor[mic_order[j] - 1]->out[i][1],2));
         }
 
-        // printf("asdasda\n");
-        // calculate resultant vector x value;
-        // this should have the cos component of both mics 2 and 3.
-        // use ref. angle π/6.
+        // we assume the microphones are 120 degrees (2/3 π radians) apart, with the first mic along the y axis.
+
+        // calculate resultant vector x and y values;
+        // x has the cos component of both mics 2 and 3.
+        // y has all of mic 1 and the sin component of mics 2 and 3.
+        // use ref. angle π/6 = (π/2)/3.
         x = m[1] * cos(M_PI_2 / 3.0) - m[2] * cos(M_PI_2 / 3.0);
         y = m[0] - m[1] * sin(M_PI_2 / 3.0) - m[2] * sin(M_PI_2 / 3.0);
 
@@ -106,11 +112,10 @@ void WaveTracer::process_data() {
 
         write_data(data_arg, data_mag, i);
 
-        // printf("data: %9.5lf, mag: %9.5lf\n", data[i][1], mag);
-
     }
 }
 
+// write new data to the histogram.
 void WaveTracer::write_data(double arg, double mag, int f) {
     data[index][f][0] = arg;
     data[index][f][1] = mag;
@@ -123,11 +128,13 @@ void WaveTracer::get_avg_data(int f, double *arg_out, double *mag_out) {
     double x = 0;
     double y = 0;
 
+    // add up all the x and y components of all the data.
     for (int i = 0; i < histogram_size; i++) {
         x += data[i][f][1] * cos(data[i][f][0]) * (((histogram_size - index + i) % histogram_size) * 2.0 / histogram_size);
         y += data[i][f][1] * sin(data[i][f][0]) * (((histogram_size - index + i) % histogram_size) * 2.0 / histogram_size);
     }
 
+    // write output to pointers.
     *arg_out = arg(x, y);
-    *mag_out = *arg_out == 0 ? 0 : mag(x, y);
+    *mag_out = *arg_out == 0 ? 0 : mag(x, y) / histogram_size;
 }

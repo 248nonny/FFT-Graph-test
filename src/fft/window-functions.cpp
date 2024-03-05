@@ -5,16 +5,17 @@
 
 namespace FFT {
 
+    // Another note: the math for the functions was mainly taken from the respective wikipedia articles.
+    // Also, I wrote this code for earlier tests with the FFTW3 library,
+    // but it turns out that a windowless FFT works great for the purposes of
+    // WaveTrace, so this code is unused in the proof of concept for the time being; it remains as an option
+    // in the future.
 
 
-    // should use the e2i function to convert enumeration to int.
-    // extern const short int HANN = 0;
-    // extern const short int FLAT_TOP = 1;
-    // extern const short int HAMMING = 2;
-    // extern const short int BLACKMAN = 3;
-    // extern const short int BLACKMAN_HARRIS = 4;
-    // extern const short int BARTLETT = 5;
-    // extern const short int WELCH = 6;
+    // for the below, use the e2i function described in the header file to
+    // get the index for each function. This index can be fed into the below "names" to
+    // get the name of a function as a string, or to "function" to get a lambda function
+    // variable that contains the window function.
 
     const char* names[window_count] = {
         "Hann",

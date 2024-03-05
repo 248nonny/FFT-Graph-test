@@ -3,9 +3,21 @@
 
 #include <cstdio>
 
-class FFTBuffer {
+namespace FFT {
+
+
+/*
+A note:
+This object is currently not in use for the WaveTrace proof of concept,
+since for the POC it was only necessary to consider the most recently computed
+FFT for each microphone. This object was tested and does work, and it will be useful
+for storing a spectogram of each mic's output for analyzing how the FFTs change with time,
+which could provide more accurate direction predictions.
+*/
+
+class Buffer {
 public:
-    FFTBuffer();
+    Buffer();
 
     void set_size(int new_frame_count = -1, int new_frame_size = -1);
 
@@ -37,3 +49,5 @@ private:
     inline void increase_index() {frame_index = (frame_index + 1) % frame_count; }
 
 };
+
+}
