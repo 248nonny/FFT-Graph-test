@@ -144,7 +144,7 @@ void MainWindow::update_compass() {
         for (int j = 0; j < compass.get_data_size(); j++) {
             // add the data to the proper interval in compass's data.
             if (data_arg <= j * interval && data_arg >= 0.001) {
-                compass.data[j] += pow(data_mag * .05,3);
+                compass.data[j] += pow(data_mag * .5,3);
                 break;
             }
         }
@@ -157,7 +157,7 @@ void MainWindow::update_compass() {
         for (int j = 0; j < 1000; j++) {
             volume[i] += abs(audio_buffer[wave_tracer->mic_order[i] - 1]->read_value(j-1000));
         }
-        compass.mic_volumes[i] = volume[i] / 100;
+        compass.mic_volumes[i] = volume[i] / 10;
     }
 
     compass.queue_draw();

@@ -70,6 +70,7 @@ int main (int argc, char *argv[]) {
         Pa_Sleep(1000 * 1000);
     #endif
 
+    delete wave_tracer;
     audio_handler.close_stream();
 
     return 0;

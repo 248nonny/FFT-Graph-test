@@ -76,10 +76,11 @@ void WaveTracer::process_data() {
 
     double m[3];  // magnitudes of frequencies will be stored here for mics 1 thru 3.
 
-    for (int i = 0; i < data_size - 4000; i++) {
+    for (int i = 0; i < data_size - 6000; i++) {
 
-        // ignore the last 4000 data points, since the high frequencies are full of noise and propagate
-        // more uniformly and through more things, making their direction estimate more error prone.
+        // ignore the last 6000 data points (out of 8192) since the high frequencies are full of noise,
+        // making their direction estimate more error prone;
+        // this makes the output much more reliable.
 
         // we assume mic 1 points forwards, and mic 2 and 3 are located counterclockwise at 120 degree intervals.
         // we add the fft data from each microphone as vectors pointing in the direction of each microphone,
